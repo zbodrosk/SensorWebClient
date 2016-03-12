@@ -745,7 +745,7 @@
                     </excludes>
                     <strictCheck>true</strictCheck>
                 </configuration>
-                <executions>
+<!--                 <executions>
                     <execution>
                         <id>check-license</id>
                         <phase>initialize</phase>
@@ -753,7 +753,7 @@
                             <goal>check</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions> -->
             </plugin>
 
             <plugin>
@@ -767,7 +767,7 @@
                     </licenseMapping>
                     <generateChildNotices>false</generateChildNotices>
                 </configuration>
-                <executions>
+<!--                 <executions>
                     <execution>
                         <id>check-license</id>
                         <phase>initialize</phase>
@@ -775,7 +775,7 @@
                             <goal>check</goal>
                         </goals>
                     </execution>
-                </executions>
+                </executions> -->
             </plugin>
 
             <plugin>
