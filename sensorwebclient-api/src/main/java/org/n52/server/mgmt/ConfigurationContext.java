@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 
 import javax.servlet.ServletContext;
@@ -46,6 +47,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.n52.server.da.MetadataHandler;
 import org.n52.server.da.oxf.DefaultMetadataHandler;
+import org.n52.server.util.GeoNetwork;
 import org.n52.server.util.Statistics;
 import org.n52.shared.serializable.pojos.sos.SOSMetadata;
 import org.slf4j.Logger;
@@ -147,6 +149,11 @@ public class ConfigurationContext implements ServletContextAware {
             LOGGER.info("GOING INTO DEV MODE!");
         }
         Statistics.scheduleStatisticsLog(STATISTICS_INTERVAL);
+        
+        Set<String> sosSet = GeoNetwork.getGeoNetworkSosLinks("http://elter.biosense.rs/geonetwork");
+        LOGGER.info("sosSet size: " + sosSet.size());
+        LOGGER.info("sosSet data: " + sosSet);
+        
     }
 
     /**
