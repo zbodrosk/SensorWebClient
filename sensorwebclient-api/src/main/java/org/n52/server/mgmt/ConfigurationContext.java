@@ -154,9 +154,12 @@ public class ConfigurationContext implements ServletContextAware {
         LOGGER.info("sosSet size: " + sosSet.size());
         LOGGER.info("sosSet data: " + sosSet);
         
-        HashMap<String, String> vSOSSet = GeoNetwork.validateSOSLinks(sosSet);
-        LOGGER.info("vSOSSet size: " + vSOSSet.size());
-        LOGGER.info("vSOSSet data: " + vSOSSet);
+        HashMap<String, SOSMetadata> vSOS = GeoNetwork.validateSOSLinks(sosSet);
+        LOGGER.info("vSOS size: " + vSOS.size());
+        LOGGER.info("vSOS data: " + vSOS);
+        
+        String path = webappDirectory + "ds" + File.separator + "sos-instances.data.xml";
+        GeoNetwork.updatePreConfiguredServices(path, vSOS);
         
     }
 

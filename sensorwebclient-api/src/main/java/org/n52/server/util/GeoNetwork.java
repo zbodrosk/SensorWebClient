@@ -1,20 +1,29 @@
 package org.n52.server.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.n52.oxf.util.web.HttpClientException;
 import org.n52.oxf.util.web.SimpleHttpClient;
+import org.n52.shared.serializable.pojos.sos.SOSMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -97,9 +106,11 @@ public class GeoNetwork {
 		return sosSet;
 	}
 	
-	public static HashMap<String, String> validateSOSLinks(Set<String> sosSet){
+	public static HashMap<String, SOSMetadata> validateSOSLinks(Set<String> sosSet){
+		
 		LOGGER.info("SOS URLs validation started");
-		HashMap<String, String> vSosSet = new HashMap<String, String>();
+		
+		HashMap<String, SOSMetadata> vSos = new HashMap<String, SOSMetadata>();
 		
 		///test!!!
 		sosSet.add("http://getit.lter-europe.net/observations/sos");
@@ -108,8 +119,7 @@ public class GeoNetwork {
 		if(sosSet.size() > 0){
 			for(String url: sosSet){
 				LOGGER.info("!#!#!# URL "+ url);
-//				if(url.equals("http://sdf.ndbc.noaa.gov/sos/server.php") || url.equals("http://getit.lter-europe.net/observations/sos")){
-				String sosVersion = null;
+				if(url.equals("http://sdf.ndbc.noaa.gov/sos/server.php") || url.equals("http://getit.lter-europe.net/observations/sos")){
 				SimpleHttpClient simpleClient = new SimpleHttpClient();
 				try{
 					HttpResponse response = simpleClient.executeGet(url+"?REQUEST=GetCapabilities&SERVICE=SOS");
@@ -146,14 +156,19 @@ public class GeoNetwork {
 				        		}
 			        		}
         					if(allowedValues.size() > 0){
+        						NodeList nlTitle = doc.getElementsByTagName("ows:Title");
+        						String title = "";
+        						if(nlTitle.getLength() > 0){
+        							title = nlTitle.item(0).getTextContent();
+        						}
         						if(allowedValues.contains("2.0.0")){
-        							sosVersion = "2.0.0";
 //        							LOGGER.info("sosVersion = 2.0.0!!!");
-        							vSosSet.put(url, "2.0.0");
+        							SOSMetadata md = new SOSMetadata(url, title, "2.0.0");
+        							vSos.put(url, md);
         						}else if(allowedValues.contains("1.0.0")){
-        							sosVersion = "1.0.0";
 //        							LOGGER.info("sosVersion = 1.0.0!!!");
-        							vSosSet.put(url, "1.0.0");
+        							SOSMetadata md = new SOSMetadata(url, title, "1.0.0");
+        							vSos.put(url, md);
         						}	
         					}
 			        	}
@@ -180,13 +195,114 @@ public class GeoNetwork {
 //					e.printStackTrace();
 					LOGGER.warn("SAXException: "+ url);
 				}
-//			}
+			}
 				
 			}
 		}
 		
 		LOGGER.info("SOS URLs validation ended");
-		return vSosSet;
+		return vSos;
+	}
+	
+	public static void updatePreConfiguredServices(String path, HashMap vSos){
+		
+		LOGGER.info("SOS data file update started");
+		
+		try {
+//			File sosDataSource = new File(path);
+	        
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	    	DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	    	LOGGER.info("Parse: " + path);
+	    	Document doc = dBuilder.parse(path);
+	    	
+	    	//root element
+	    	Element instances = doc.getDocumentElement();
+
+	    	
+	    	if(vSos.size() > 0){
+	    		NodeList nlUrl = doc.getElementsByTagName("url");
+	    		Iterator it = vSos.entrySet().iterator();
+	    		while(it.hasNext()){
+	    			SOSMetadata sosMetadata = (SOSMetadata)((Map.Entry) it.next()).getValue();
+	    			
+	    			//skip if exists
+	    			boolean skip = false;
+	    			for(int i = 0; i < nlUrl.getLength(); i++){
+	    				LOGGER.info("!!! el. " + nlUrl.item(i).getTextContent());
+	    				if(nlUrl.item(i).getTextContent().equals(sosMetadata.getServiceUrl())){
+	    					skip = true;
+	    				}
+	    			}
+	    			
+	    			if(!skip){
+	    				
+		    	    	Element instance = doc.createElement("instance");
+		    	    	
+		    	    	Element itemName = doc.createElement("itemName");
+		    	    	itemName.appendChild(doc.createTextNode(sosMetadata.getTitle()));
+		    	    	instance.appendChild(itemName);
+		    	    	
+		    	    	Element url = doc.createElement("url");
+		    	    	url.appendChild(doc.createTextNode(sosMetadata.getServiceUrl()));
+		    	    	instance.appendChild(url);
+		    	    	
+		    	    	Element version = doc.createElement("version");
+		    	    	version.appendChild(doc.createTextNode(sosMetadata.getVersion()));
+		    	    	instance.appendChild(version);
+		    	    	
+		    	    	Element timeout = doc.createElement("timeout");
+		    	    	timeout.appendChild(doc.createTextNode("30000"));
+		    	    	instance.appendChild(timeout);
+		    	    	
+		    	    	Element supportsFirstLatest = doc.createElement("supportsFirstLatest");
+		    	    	supportsFirstLatest.appendChild(doc.createTextNode("true")); //!
+		    	    	instance.appendChild(supportsFirstLatest);
+		    	    	
+		    	    	Element metadataHandler = doc.createElement("metadataHandler");
+		    	    	metadataHandler.appendChild(doc.createTextNode("org.n52.server.da.oxf.DefaultMetadataHandler")); //!
+		    	    	instance.appendChild(metadataHandler);
+		    	    	
+		    	    	Element adapter = doc.createElement("adapter");
+		    	    	adapter.appendChild(doc.createTextNode("org.n52.server.da.oxf.SOSAdapter_OXFExtension")); //!
+		    	    	instance.appendChild(adapter);
+		    	    	
+		    	    	instances.appendChild(instance);
+		    	    	
+		    	    	LOGGER.info("!!! added: " + sosMetadata.getServiceUrl());
+	    			}
+	    		}
+	    		
+	    	}
+	    	
+	    	//write the content into xml file
+			TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			Transformer transformer = transformerFactory.newTransformer();
+			DOMSource source = new DOMSource(doc);
+			StreamResult result = new StreamResult(new File(path).getPath());
+			transformer.transform(source, result);
+	    	
+	    	
+	    	
+		} catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SAXException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TransformerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		LOGGER.info("SOS data file update ended");
+
 	}
 
 }
