@@ -187,8 +187,10 @@ public class DescribeSensorParser {
         	AbstractProcessType abstractProcessType = members[0].getProcess();
         	if (abstractProcessType instanceof AbstractComponentType) {
         		final AbstractComponentType sysDoc = (AbstractComponentType) abstractProcessType;
-        		final PositionType position = sysDoc.getPosition().getPosition();
-        		return createPoint(position);
+        		if (sysDoc.isSetPosition() && sysDoc.getPosition().isSetPosition()) {
+        			final PositionType position = sysDoc.getPosition().getPosition();
+        			return createPoint(position);
+        		}
         	}
         }
         return null;
@@ -558,28 +560,32 @@ public class DescribeSensorParser {
         final List<String> phenomenons = new ArrayList<String>();
         final AbstractProcessType absProcessType = smlDoc.getSensorML().getMemberArray()[0].getProcess();
         OutputList outputs = null;
-        if (absProcessType instanceof AbstractComponentType) {
+        if (absProcessType instanceof AbstractComponentType && ((AbstractComponentType) absProcessType).isSetOutputs()
+        		&& ((ProcessModelType) absProcessType).getOutputs().isSetOutputList()) {
         	outputs = ((AbstractComponentType) absProcessType).getOutputs().getOutputList();
         }
-        else if (absProcessType instanceof ProcessModelType) {
+        else if (absProcessType instanceof ProcessModelType && ((AbstractComponentType) absProcessType).isSetOutputs()
+        		&& ((ProcessModelType) absProcessType).getOutputs().isSetOutputList()) {
             outputs = ((ProcessModelType) absProcessType).getOutputs().getOutputList();
         }
-        for (final IoComponentPropertyType output : outputs.getOutputArray()) {
-            if (output.isSetObservableProperty()) {
-                phenomenons.add(output.getObservableProperty().getDefinition());
-            }
-            else if (output.getAbstractDataArray1() != null) {
-                phenomenons.add(output.getAbstractDataArray1().getDefinition());
-            }
-            else if (output.isSetQuantity()) {
-                phenomenons.add(output.getQuantity().getDefinition());
-            }
-            else if (isCategoryCodeSpaceHrefSet(output)) {
-            	phenomenons.add(output.getCategory().getDefinition());
-            }
-            else {
-                phenomenons.add(output.getName());
-            }
+        if (outputs != null) {
+	        for (final IoComponentPropertyType output : outputs.getOutputArray()) {
+	            if (output.isSetObservableProperty()) {
+	                phenomenons.add(output.getObservableProperty().getDefinition());
+	            }
+	            else if (output.getAbstractDataArray1() != null) {
+	                phenomenons.add(output.getAbstractDataArray1().getDefinition());
+	            }
+	            else if (output.isSetQuantity()) {
+	                phenomenons.add(output.getQuantity().getDefinition());
+	            }
+	            else if (isCategoryCodeSpaceHrefSet(output)) {
+	            	phenomenons.add(output.getCategory().getDefinition());
+	            }
+	            else {
+	                phenomenons.add(output.getName());
+	            }
+	        }
         }
         return phenomenons;
     }
