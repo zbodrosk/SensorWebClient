@@ -113,13 +113,13 @@ public class GeoNetwork {
 		HashMap<String, SOSMetadata> vSos = new HashMap<String, SOSMetadata>();
 		
 		///test!!!
-		sosSet.add("http://getit.lter-europe.net/observations/sos");
+//		sosSet.add("http://getit.lter-europe.net/observations/sos");
 		///
 		 
 		if(sosSet.size() > 0){
 			for(String url: sosSet){
 				LOGGER.info("!#!#!# URL "+ url);
-				if(url.equals("http://sdf.ndbc.noaa.gov/sos/server.php") || url.equals("http://getit.lter-europe.net/observations/sos")){
+//				if(url.equals("http://sdf.ndbc.noaa.gov/sos/server.php") || url.equals("http://getit.lter-europe.net/observations/sos")){
 				SimpleHttpClient simpleClient = new SimpleHttpClient();
 				try{
 					HttpResponse response = simpleClient.executeGet(url+"?REQUEST=GetCapabilities&SERVICE=SOS");
@@ -171,6 +171,8 @@ public class GeoNetwork {
         							vSos.put(url, md);
         						}	
         					}
+			        	} else {
+			        		LOGGER.info("URL is not a valid SOS: " + url);
 			        	}
 					}else{
 						LOGGER.info("Response !200: "+ response.getStatusLine().getStatusCode() + " " + url);
@@ -184,7 +186,7 @@ public class GeoNetwork {
 					LOGGER.warn("IllegalStateException: "+ url);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
-//					e.printStackTrace();
+					e.printStackTrace();
 					LOGGER.warn("IOException: "+ url);
 				} catch (ParserConfigurationException e) {
 					// TODO Auto-generated catch block
@@ -195,7 +197,7 @@ public class GeoNetwork {
 //					e.printStackTrace();
 					LOGGER.warn("SAXException: "+ url);
 				}
-			}
+//			}
 				
 			}
 		}

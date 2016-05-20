@@ -1,8 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- TODO create a client login for admins (RESTful?) to configure file via
-	web interface -->
-<!-- Some of these properties are not implemented yet! -->
-<instances>
+<?xml version="1.0" encoding="UTF-8"?><!-- TODO create a client login for admins (RESTful?) to configure file via
+	web interface --><!-- Some of these properties are not implemented yet! --><instances>
 
 <!--    <instance>
         <itemName>PEGELONLINE</itemName>
@@ -73,7 +70,7 @@
         <defaultZoom>13</defaultZoom>
     </instance> -->
 
-    <instance>
+<!-- DOBAR SOS     <instance>
         <itemName>Wupperverband</itemName>
         <url>http://fluggs.wupperverband.de/sos/sos</url>
         <version>1.0.0</version>
@@ -89,7 +86,7 @@
         <requestChunk>200</requestChunk>
         <autoZoom>true</autoZoom>
     </instance>
-
+ -->
 <!--	<instance>
 		<itemName>GRDC (Kisters SOS)</itemName>
 		<url>http://kiwis.kisters.de/KiWIS/KiWIS?datasource=3</url>
@@ -311,5 +308,48 @@
 		<autoZoom>true</autoZoom>
 	</instance>
 
--->
+	<instance>
+		<itemName>National Data Buoy Center SOS</itemName>
+		<url>http://sdf.ndbc.noaa.gov/sos/server.php</url>
+		<version>1.0.0</version>
+		<supportsFirstLatest>true</supportsFirstLatest>
+		<metadataHandler>org.n52.server.da.oxf.DefaultMetadataHandler</metadataHandler>
+		<adapter>org.n52.server.da.oxf.SOSAdapter_OXFExtension</adapter>
+	</instance>
+--> 
+	<!-- <instance>
+		<itemName>LTER Europe Sensor Observation Service (SOS)</itemName>
+		<url>http://sp7.irea.cnr.it/tomcat/envsos/sos</url>
+		<version>1.0.0</version>
+		<supportsFirstLatest>true</supportsFirstLatest>
+		<metadataHandler>org.n52.server.da.oxf.DefaultMetadataHandler</metadataHandler>
+		<adapter>org.n52.server.da.oxf.SOSAdapter_OXFExtension</adapter>
+	</instance> -->
+	
+	<instance>
+		<itemName>NextData</itemName>
+		<url>http://nextdata.get-it.it/observations/sos/kvp</url>
+		<version>1.0.0</version>
+		<supportsFirstLatest>true</supportsFirstLatest>
+		<metadataHandler>org.n52.server.da.oxf.DefaultMetadataHandler</metadataHandler>
+		<adapter>org.n52.server.da.oxf.SOSAdapter_OXFExtension</adapter>
+	</instance>
+	
+	<!-- <instance>
+		<itemName>Get-It Starter Kit of LTER Europe</itemName>
+		<url>http://getit.lter-europe.net/observations/sos</url>
+		<version>1.0.0</version>
+		<supportsFirstLatest>true</supportsFirstLatest>
+		<metadataHandler>org.n52.server.da.oxf.DefaultMetadataHandler</metadataHandler>
+		<adapter>org.n52.server.da.oxf.SOSAdapter_OXFExtension</adapter>
+	</instance> -->
+	
+	<instance>
+		<itemName>CNR-ISE</itemName>
+		<url>http://sk.ise.cnr.it/observations/sos/kvp</url>
+		<version>1.0.0</version>
+		<supportsFirstLatest>true</supportsFirstLatest>
+		<metadataHandler>org.n52.server.da.oxf.DefaultMetadataHandler</metadataHandler>
+		<adapter>org.n52.server.da.oxf.SOSAdapter_OXFExtension</adapter>
+	</instance>
 </instances>

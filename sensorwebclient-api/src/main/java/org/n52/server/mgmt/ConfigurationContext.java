@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -150,16 +151,21 @@ public class ConfigurationContext implements ServletContextAware {
         }
         Statistics.scheduleStatisticsLog(STATISTICS_INTERVAL);
         
-        Set<String> sosSet = GeoNetwork.getGeoNetworkSosLinks("http://elter.biosense.rs/geonetwork");
-        LOGGER.info("sosSet size: " + sosSet.size());
-        LOGGER.info("sosSet data: " + sosSet);
-        
-        HashMap<String, SOSMetadata> vSOS = GeoNetwork.validateSOSLinks(sosSet);
-        LOGGER.info("vSOS size: " + vSOS.size());
-        LOGGER.info("vSOS data: " + vSOS);
-        
-        String path = webappDirectory + "ds" + File.separator + "sos-instances.data.xml";
-        GeoNetwork.updatePreConfiguredServices(path, vSOS);
+//        Set<String> sosSet = GeoNetwork.getGeoNetworkSosLinks("http://elter.biosense.rs/geonetwork");
+//        Set<String> sosSet = new HashSet<String>();
+//        sosSet.add("http://getit.lter-europe.net/observations/sos");
+//        sosSet.add("http://sdf.ndbc.noaa.gov/sos/server.php");
+//        sosSet.add("http://sp7.irea.cnr.it/tomcat/envsos/sos");
+//        sosSet.add("http://nextdata.get-it.it/observations/sos/kvp");
+//        LOGGER.info("sosSet size: " + sosSet.size());
+//        LOGGER.info("sosSet data: " + sosSet);
+//        
+//        HashMap<String, SOSMetadata> vSOS = GeoNetwork.validateSOSLinks(sosSet);
+//        LOGGER.info("vSOS size: " + vSOS.size());
+//        LOGGER.info("vSOS data: " + vSOS);
+//        
+//        String path = webappDirectory + "ds" + File.separator + "sos-instances.data.xml";
+//        GeoNetwork.updatePreConfiguredServices(path, vSOS);
         
     }
 
